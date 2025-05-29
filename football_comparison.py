@@ -97,7 +97,7 @@ if comparison_type == "Players":
 
     attribute_options = ["Attacking", "Defensive", "Goalkeeping"]
 
-    # Now 5 columns for attribute, player1, player2, position
+    # 4 columns for attribute, player1, player2, position
     col_attr, col_p1, col_p2, col_pos = st.columns([1, 1.5, 1.5, 1.5])
 
     with col_attr:
@@ -148,7 +148,7 @@ if comparison_type == "Players":
         )
         player2 = None if player2 == "None" else player2
 
-    # Load other datasets
+    # Load base dataframes
     all_shots_df = pd.read_pickle('all_shots_df.pkl')
     df_filename_map = {
         "Attacking": "attacking_attributes_df.pkl",
@@ -161,8 +161,10 @@ if comparison_type == "Players":
         "Goalkeeping": "goalkeeping_attributes.pkl",
     }
 
-    df = pd.read_pickle(df_filename_map[attribute_type])
-    attributes = pd.read_pickle(attr_filename_map[attribute_type])
+    df_standard = pd.read_pickle(df_filename_map[attribute_type])
+    attributes_standard = pd.read_pickle(attr_filename_map[attribute_type])
+    df_per90 = pd.read_pickle(df_filename_map[attribute_type].replace("_df.pkl", "90_df.pkl"))
+    attributes_per90 = pd.read_pickle(attr_filename_map[attribute_type].replace(".pkl", "90.pkl"))
 
     st.markdown("---")
 
@@ -202,31 +204,42 @@ if comparison_type == "Players":
                     st.image(ImageOps.expand(Image.open(buf), border=30, fill='white'))
 
             with tab_box:
-                fig_box = plot_two_players_boxplots_matplotlib(df, attributes, player1, player2, pos_filter=position)
+                fig_box = plot_two_players_boxplots_matplotlib(df_standard, attributes_standard, player1, player2, pos_filter=position)
                 display_figure(fig_box)
 
             with tab_density:
-                fig_density = plot_two_players_density_plots_matplotlib(df, attributes, player1, player2, pos_filter=position)
+                fig_density = plot_two_players_density_plots_matplotlib(df_standard, attributes_standard, player1, player2, pos_filter=position)
                 display_figure(fig_density)
 
             with tab_hist:
-                fig_hist = plot_two_players_histogram_plots_matplotlib(df, attributes, player1, player2, pos_filter=position)
+                fig_hist = plot_two_players_histogram_plots_matplotlib(df_standard, attributes_standard, player1, player2, pos_filter=position)
                 display_figure(fig_hist)
 
         with col_radar:
             st.subheader("📡 Radar Plot")
             radar_tab1, radar_tab2 = st.tabs(["⏱️ Per 90", "📊 Total"])
-            for tab_label, suffix in zip([radar_tab2, radar_tab1], ["", "90"]):
-                with tab_label:
-                    fig_radar, error = get_two_players_radar_figure_matplotlib(df, attributes, player1, player2, pos_filter=position)
-                    if error:
-                        st.error(error)
-                    else:
-                        display_figure(fig_radar)
+
+            with radar_tab2:
+                fig_radar, error = get_two_players_radar_figure_matplotlib(
+                    df_standard, attributes_standard, player1, player2, pos_filter=position
+                )
+                if error:
+                    st.error(error)
+                else:
+                    display_figure(fig_radar)
+
+            with radar_tab1:
+                fig_radar_90, error_90 = get_two_players_radar_figure_matplotlib(
+                    df_per90, attributes_per90, player1, player2, pos_filter=position
+                )
+                if error_90:
+                    st.error(error_90)
+                else:
+                    display_figure(fig_radar_90)
 
         st.markdown("---")
 
         st.subheader("📋 Comparison Matrix")
-        styled_matrix = get_two_players_comparison_matrix(df, attributes, player1, player2, pos_filter=position)
+        styled_matrix = get_two_players_comparison_matrix(df_standard, attributes_standard, player1, player2, pos_filter=position)
         if styled_matrix is not None:
             st.dataframe(styled_matrix, use_container_width=True)
