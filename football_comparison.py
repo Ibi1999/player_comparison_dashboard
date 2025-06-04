@@ -37,7 +37,7 @@ if comparison_type == "Players":
             "attribute": "Attacking",
             "position": "MF",
         },
-        "Virgil van Dijk vs Ruben Dias": {
+        "Virgil van Dijk vs William Saliba": {
             "player1": "Virgil van Dijk",
             "player2": "William Saliba",
             "attribute": "Defensive",
@@ -157,7 +157,7 @@ if comparison_type == "Players":
     }
     attr_filename_map = {
         "Attacking": "attacking_attributes.pkl",
-        "Defensive": "defensive.pkl",
+        "Defensive": "defensive_attributes.pkl.pkl",
         "Goalkeeping": "goalkeeping_attributes.pkl",
     }
 
