@@ -157,7 +157,7 @@ if comparison_type == "Players":
     }
     attr_filename_map = {
         "Attacking": "attacking_attributes.pkl",
-        "Defensive": "defensive_attributes.pkl.pkl",
+        "Defensive": "defensive_attributes.pkl",
         "Goalkeeping": "goalkeeping_attributes.pkl",
     }
 
